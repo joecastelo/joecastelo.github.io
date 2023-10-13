@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Table</title>
+    <title>Progressão de cargas</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
@@ -124,7 +124,7 @@
 //                 data: data[0],
 //                 },
                 {
-                label: '5%',
+                label: 'Esperado+5%',
                 tension: 0.1,
                 fillColor:   "#0000FF",
                 backgroundColor : "#0000FF",
@@ -147,6 +147,8 @@
             },
             options: {
                 animation,
+                tooltips: {enabled: false},
+                hover: {mode: null},
                 interaction: {
                 intersect: false
                 },
@@ -188,9 +190,11 @@
                 }
             }
             };
-
-            let ctx = document.getElementById('myChart').getContext('2d')
+            let canvas = document.getElementById('myChart')
+            let ctx = canvas.getContext('2d')
             let chartStatus = Chart.getChart("myChart"); // <canvas> id
+                canvas.setAttribute('tabindex','0');
+                canvas.focus();
             if (chartStatus != undefined) {
                 chartStatus.destroy();
             }
