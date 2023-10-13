@@ -149,6 +149,7 @@
                 animation,
                 tooltips: {enabled: false},
                 hover: {mode: null},
+                events: [],
                 interaction: {
                 intersect: false
                 },
@@ -193,8 +194,10 @@
             let canvas = document.getElementById('myChart')
             let ctx = canvas.getContext('2d')
             let chartStatus = Chart.getChart("myChart"); // <canvas> id
-                canvas.setAttribute('tabindex','0');
-                canvas.focus();
+            canvas.setAttribute('tabindex','0');
+            canvas.focus();
+            var scale = 'scale(1)';
+            document.body.style.webkitTransform =  scale;    // Chrome, Opera, Safari
             if (chartStatus != undefined) {
                 chartStatus.destroy();
             }
