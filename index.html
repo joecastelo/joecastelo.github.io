@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Table</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        table {
+            border-collapse: collapse;
+
+            width: 50%;
+            margin: 30px;
+            
+        }
+        input{
+            max-width: 70px;
+        }
+        #buttons{
+            align-content: center;
+            flex: auto;
+            margin: 10px;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        canvas {
+            padding: 12px;
+            min-width: 300px;
+            min-height: 600px;
+
+
+        }
+    </style>
+</head>
+
+<body>
+
+
+
+    <table id="dynamic-table">
+        <tr>
+            <th>Semana</th>
+            <th>Peso</th>
+            <th>Reps</th>
+            <!-- <th>Séries</th> -->
+        </tr>
+        <tr>
+            <td>1</td>
+            <td><input id="1,1" value="12" type="text"></input></td>
+            <td><input id="1,2" value="12" type="text"></td>
+            <!-- <td><input type="text"></td> -->
+        </tr>
+    </table>
+    <div id='buttons'>
+        <button onclick="addRow()">Adicionar Semana</button>
+        <button onclick="removeRow()">Remover Semana</button>
+        <button onclick="ttt()">Gráfico</button>
+    </div>
+
+    <div>
+        <canvas id="myChart"></canvas>
+      </div>
+    <script>
+        function ttt(){
+            const data = generateScatterPlot()
+            const expectWeight = expectedWeigth(data)
+            const adjustWeight  = adjustedWeight(data)
+            const labels = Array.from({length:data[0].length}).map((_,index)=>`Semana ${index + 1}`)
+            const totalDuration = 700;
+            const delayBetweenPoints = totalDuration / data.length;
+            const previousY = (ctx) =>
+             ctx.index === 0 ? ctx.chart.scales.y.getPixelForValue(100) : 
+             ctx.chart.getDatasetMeta(ctx.datasetIndex).data[ctx.index - 1].getProps(['y'], true).y;
+             
+            const animation = {
+            x: {
+                type: 'number',
+                easing: 'linear',
+                duration: delayBetweenPoints,
+                from: NaN, // the point is initially skipped
+                delay(ctx) {
+                if (ctx.type !== 'data' || ctx.xStarted) {
+                    return 0;
+                }
+                ctx.xStarted = true;
+                return ctx.index * delayBetweenPoints;
+                }
+            },
+            y: {
+                type: 'number',
+                easing: 'linear',
+                duration: delayBetweenPoints,
+                from: previousY,
+                delay(ctx) {
+                if (ctx.type !== 'data' || ctx.yStarted) {
+                    return 0;
+                }
+                ctx.yStarted = true;
+                return ctx.index * delayBetweenPoints;
+                }
+            }
+            };
+            const config = {
+            type: 'line',
+            data: {
+                datasets: [
+                    // {
+//                 label: 'Peso',
+//                 borderColor: "#FF0000",
+//                 fillColor:   "#FF0000",
+//                 backgroundColor : "#FF0000",
+//                 borderWidth: 3,
+//                 radius: 1,
+//                 tension: 0.1
+// ,
+//                 data: data[0],
+//                 },
+                {
+                label: '5%',
+                tension: 0.1,
+                fillColor:   "#0000FF",
+                backgroundColor : "#0000FF",
+                borderColor: "#0000FF",
+                borderWidth: 3,
+                radius: 1,
+                data: expectWeight,
+                },
+                {
+                label: 'Ajustado',
+                tension: 0.1,
+                fillColor:   "#008000",
+                backgroundColor : "#008000",
+                borderColor: "#008000",
+                borderWidth: 3,
+                radius: 1,
+                data: adjustWeight,
+                }
+                ]
+            },
+            options: {
+                animation,
+                interaction: {
+                intersect: false
+                },
+                plugins: {
+                legend: {
+                    labels:{
+                        font:{
+                            size : 15,
+                            margin : 5,
+                        
+                        }
+                    }
+                }
+                },
+                scales: {
+                x: {
+                    // type: 'linear',
+                    text : "Semanas",
+                    display: true,
+                    ticks: {
+                font: {
+                    size: 15,
+                            }           
+                        },
+                },
+                y: {
+                    grace: '5%',
+
+                    // type: 'linear',
+                    ticks: {
+                font: {
+                    size: 15,
+                            }           
+                        },
+                    display: true,
+
+                    text : "Peso em kg"
+                }
+                }
+            }
+            };
+
+            let ctx = document.getElementById('myChart').getContext('2d')
+            let chartStatus = Chart.getChart("myChart"); // <canvas> id
+            if (chartStatus != undefined) {
+                chartStatus.destroy();
+            }
+            chart = new Chart(ctx, config); 
+
+        }
+
+        function addRow() {
+            var table = document.getElementById("dynamic-table");
+            var newRow = table.insertRow(table.rows.length);
+            
+            var indexCell = newRow.insertCell(0);
+            var vl = table.rows.length - 1
+            indexCell.innerHTML = vl; // Index starts from 1
+
+            for (var i = 1; i < table.rows[0].cells.length; i++) {
+                var cell = newRow.insertCell(i);
+                var id = `${vl},${i}`
+                var lastcell = `${vl-1},${i}`
+                var lastCellElement = document.getElementById(lastcell);
+                var lastValue =  lastCellElement.value === undefined  ? "" : i != 2?parseFloat(lastCellElement.value)  :  parseFloat(lastCellElement.value) + 1
+            
+                cell.innerHTML =   `<input id=${id} value=${lastValue} type="text"></input>`;
+            }
+        }
+
+        function removeRow() {
+            var table = document.getElementById("dynamic-table");
+            if (table.rows.length > 1) {
+                table.deleteRow(table.rows.length - 1);
+            }
+        }
+
+        function generateScatterPlot() {
+            var columnDatas = []; // Y-axis data
+            var table = document.getElementById("dynamic-table");
+
+
+            for (var i = 1; i < table.rows[0].cells.length; i++) { // Start from 1 to skip the first column
+                var columnData = [];
+                for (var j = 1; j < table.rows.length; j++) {
+                    var cell = table.rows[j].cells[i]; // Access cells in columns other than the first
+                    var id = `${j},${i}`
+                    var value = document.getElementById(id).value;
+                    columnData.push({x: table.rows[j].cells[0].innerHTML, y:value});
+                }
+                columnDatas.push(columnData)
+                
+
+            }
+            return columnDatas;
+        }
+
+        function expectedWeigth(data){
+            var weight = data[0];
+            // 
+            return Array.from({length:weight.length}).map((_,index)=> 
+            {return {x:(weight[index].x), y:(index!==0?
+                  weight[0].y*(Math.pow(1.05,index)): weight[index].y)}});
+        }
+        function adjustedWeight(data){
+            var weight = data[0];
+            var reps = data[1];
+            var len = data[0].length
+            var repsChangePercentage = (repsNow, repsBefore)  => 2.5/100*(repsBefore - repsNow);
+            var expectedWeigthForReps = (referenceWeight, repsNow, repsBefore) => referenceWeight*(1 + repsChangePercentage(repsNow,repsBefore))
+            let narray =  Array.from({length:weight.length})
+
+            narray[0] = weight[0].y
+
+            for (let index = 1; index < narray.length; index++) {
+
+                const [performedWeigth, weigthBefore, repsNow, repsBefore] = [weight[index].y, weight[index-1].y, reps[index].y,reps[index-1].y]
+                const expectedWeigth = expectedWeigthForReps(weigthBefore,repsNow,repsBefore);
+                narray[index] = narray[index-1]*(1 + ((performedWeigth-expectedWeigth)/expectedWeigth))
+            }
+            return narray
+            // let newWeigth = function(index, newWeigthBefore) {
+            //     if(index <= 0){
+            //         return weight[0].y
+            //     }
+            //     const [performedWeigth, weigthBefore, repsNow, repsBefore] = [weight[index].y, weight[index-1].y, reps[index].y,reps[index-1].y]
+            //     const expectedWeigth = expectedWeigthForReps(weigthBefore,
+            //      repsNow,repsBefore);
+  
+            //     if(index < 2){
+            //         return performedWeigth*(1 + ((performedWeigth-expectedWeigth)/expectedWeigth))
+            //     }
+                // const [weigthB4squared, repsB4squared] = [weight[index-2].y, reps[index-2].y]
+
+                // const expectedWeigthB4 = expectedWeigthForReps(weigthB4squared,
+                //  repsBefore,repsB4squared);
+                // const newWeigthBefore = weigthBefore*(1 + 
+                //  ((weigthBefore-expectedWeigthB4)/expectedWeigthB4))
+                // console.log(newWeigthBefore)
+                // console.log(newWeigthBefore*(1 + ((performedWeigth-expectedWeigth)/expectedWeigth)))
+        }
+    </script>
+</body>
+</html>
