@@ -196,8 +196,10 @@
             let chartStatus = Chart.getChart("myChart"); // <canvas> id
             canvas.setAttribute('tabindex','0');
             canvas.focus();
-            var scale = 'scale(1)';
+            var scale = 1.0;
             document.body.style.webkitTransform =  scale;    // Chrome, Opera, Safari
+            document.body.style.zoom =  scale;    // Chrome, Opera, Safari
+
             if (chartStatus != undefined) {
                 chartStatus.destroy();
             }
