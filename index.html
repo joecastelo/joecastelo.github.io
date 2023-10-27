@@ -5,32 +5,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Progressão de cargas</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://demos.creative-tim.com/black-dashboard/assets/js/core/popper.min.js"></script>
+
+    <link href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,600,700,800" rel="stylesheet" />
     
     <style>
-        table {
-            border-collapse: collapse;
-
-            width: 50%;
-            margin: 30px;
-            
-        }
-        input{
+        body{
+            font-family: poppins;
+            color: whitesmoke;
+            background: linear-gradient(112.1deg, rgb(32, 38, 57) 11.4%, rgb(63, 76, 119) 70.2%);        }
+        input{  background: transparent;
+  border: 2px solid #333; /* Border color, adjust as needed */
+  border-radius: 10px; /* Adjust for desired border roundness */
+  border-color: whitesmoke;
+  padding: 10px;  text-align: center;
+  content: center;
+  color: white;
+  width: 100%; /* To make input elements fill their container */
             max-width: 70px;
         }
-        #buttons{
-            align-content: center;
-            flex: auto;
-            margin: 10px;
+        input:focus, textarea:focus {
+  border-color: #007BFF; /* Change border color on focus */
+  outline: none; /* Remove the default focus outline */
+  text-align: center;
+  content: center;
+}
+        button {
+        background: transparent;
+        border: 2px solid #333; /* Border color, adjust as needed */
+        border-radius: 10px; /* Adjust for desired border roundness */
+        padding: 10px;
+        color: white;
+        cursor: pointer;
+        background: rgba(0, 0, 0, 0.5)
         }
 
-        table, th, td {
-            border: 1px solid black;
-        }
+        table {
+            content: center;
+            text-align: center;
+            border-collapse: collapse;
+            width: 100%;
+            border: 2px solid #333; /* Border color, adjust as needed */
+            border-radius: 15px; /* Adjust for desired border roundness */
+            margin: 20px 0;
+            background: rgba(0, 0, 0, 0.5); /* Background color with 50% transparency */
 
-        th, td {
-            padding: 8px;
-            text-align: left;
         }
+                table th, table td {
+        border: 1px solid #333; /* Border color, adjust as needed */
+        padding: 10px;
+        text-align: center; /* Center-align text within table cells */
+        }
+        #button-container {
+            text-align: center;
+            }
         canvas {
             padding: 12px;
             min-width: 300px;
@@ -43,9 +71,15 @@
 
 <body>
 
-
+    <div id="button-container">
+    <h3>Adicione as cargas e repetições</h3>
+    <h4> 
+        Cada linha representa uma semana de treino
+    </h4>
+</div>
 
     <table id="dynamic-table">
+
         <tr>
             <th>Semana</th>
             <th>Peso</th>
@@ -59,7 +93,7 @@
             <!-- <td><input type="text"></td> -->
         </tr>
     </table>
-    <div id='buttons'>
+    <div id='button-container'>
         <button onclick="addRow()">Adicionar Semana</button>
         <button onclick="removeRow()">Remover Semana</button>
         <button onclick="ttt()">Gráfico</button>
@@ -69,6 +103,7 @@
         <canvas id="myChart"></canvas>
       </div>
     <script>
+
         function ttt(){
             const data = generateScatterPlot()
             const expectWeight = expectedWeigth(data)
@@ -125,74 +160,50 @@
 //                 },
                 {
                 label: 'Esperado+5%',
-                tension: 0.1,
-                fillColor:   "#0000FF",
-                backgroundColor : "#0000FF",
-                borderColor: "#0000FF",
-                borderWidth: 3,
-                radius: 1,
+                fill: true,
+                backgroundColor: gradientStroke,
+                borderColor: '#5f6caf',
+                fillColor: '#5f6caf',
+                borderWidth: 2,
+                borderDash: [],
+                borderDashOffset: 0.0,
+                pointBackgroundColor: '#5f6caf',
+                pointBorderColor: 'rgba(255,255,255,0)',
+                pointHoverBackgroundColor: '#5f6caf',
+                pointBorderWidth: 20,
+                pointHoverRadius: 4,
+                pointHoverBorderWidth: 15,
+                pointRadius: 4,
                 data: expectWeight,
                 },
                 {
                 label: 'Ajustado',
-                tension: 0.1,
-                fillColor:   "#008000",
-                backgroundColor : "#008000",
-                borderColor: "#008000",
-                borderWidth: 3,
-                radius: 1,
+                backgroundColor: gradientStroke,
+                borderColor: '#ffb677',
+                borderWidth: 2,
+                borderDash: [],
+                borderDashOffset: 0.0,
+                pointBackgroundColor: '#ffb677',
+                pointBorderColor: 'rgba(255,255,255,0)',
+                pointHoverBackgroundColor: '#ffb677',
+                pointBorderWidth: 20,
+                pointHoverRadius: 4,
+                pointHoverBorderWidth: 15,
+                pointRadius: 4,
                 data: adjustWeight,
                 }
                 ]
             },
-            options: {
-                animation,
-                tooltips: {enabled: false},
-                hover: {mode: null},
-                events: [],
-                interaction: {
-                intersect: false
-                },
-                plugins: {
-                legend: {
-                    labels:{
-                        font:{
-                            size : 15,
-                            margin : 5,
-                        
-                        }
-                    }
-                }
-                },
-                scales: {
-                x: {
-                    // type: 'linear',
-                    text : "Semanas",
-                    display: true,
-                    ticks: {
-                font: {
-                    size: 15,
-                            }           
-                        },
-                },
-                y: {
-                    grace: '5%',
-
-                    // type: 'linear',
-                    ticks: {
-                font: {
-                    size: 15,
-                            }           
-                        },
-                    display: true,
-
-                    text : "Peso em kg"
-                }
-                }
+            options: 
+            gradientChartConfig(animation)
             }
-            };
             let canvas = document.getElementById('myChart')
             let ctx = canvas.getContext('2d')
+            var gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
+
+            gradientStroke.addColorStop(1, 'rgba(72,72,176,0.2)');
+            gradientStroke.addColorStop(0.2, 'rgba(72,72,176,0.0)');
+            gradientStroke.addColorStop(0, 'rgba(119,52,169,0)'); //purple colors
             let chartStatus = Chart.getChart("myChart"); // <canvas> id
             canvas.setAttribute('tabindex','0');
             canvas.focus();
@@ -206,7 +217,76 @@
             chart = new Chart(ctx, config); 
 
         }
+        function gradientChartConfig(animation){
+            return {
+            animation,
 
+            maintainAspectRatio: false,
+            aspectRatio: 1.5,
+            legend: {
+            display: false
+            },
+
+            tooltips: {
+            backgroundColor: '#f5f5f5',
+            titleFontColor: '#333',
+            bodyFontColor: '#666',
+            bodySpacing: 4,
+            xPadding: 12,
+            mode: "nearest",
+            intersect: 0,
+            position: "nearest"
+            },
+            responsive: true,
+            plugins: {
+            legend: {
+                labels: {
+                font: {
+                    size: 15
+                },
+                color: '#9a9a9a',
+                }
+            }
+            }
+               ,
+            scales: {
+            x: {
+
+                    // type: 'linear',
+                    text : "Semanas",
+                    display: true,
+                    ticks: {
+                font: {
+                    size: 12,
+                    padding: 20,
+                    lineHeight: 1.2,
+                    color: "#9a9a9a",
+                    family: 'Helvetica Neue'
+                            }           
+                        },
+                },
+                y: {
+                    grace: '5%',
+
+                    // type: 'linear',
+                    ticks: {
+                font: {
+                    size: 12,
+                    padding: 20,
+                    color: "#9a9a9a",
+                    lineHeight: 1.2,
+                    family: 'Helvetica Neue'
+
+                            }           
+                        },
+
+                    display: true,
+
+                    text : "Peso em kg"
+                }
+    }
+  };
+        }
         function addRow() {
             var table = document.getElementById("dynamic-table");
             var newRow = table.insertRow(table.rows.length);
